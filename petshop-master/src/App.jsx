@@ -2,17 +2,21 @@ import React from 'react';
 import SmoothScroll from './SmoothScroll'; 
 import Hero from './Hero';
 import Services from './Services'; 
+import Footer from './Footer'; // Importando o Footer novo
 
 function App() {
   return (
     <SmoothScroll>
       <main className="w-full min-h-screen bg-white">
         
-        {/* Hero */}
+        {/* Hero Section */}
         <Hero />
 
-        {/* Nova Seção de Serviços (Estilo do vídeo) */}
+        {/* Seção de Serviços (Carousel + Modal) */}
         <Services />
+
+        {/* Footer (Rodapé) */}
+        <Footer />
 
       </main>
     </SmoothScroll>
