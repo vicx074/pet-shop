@@ -23,7 +23,6 @@ const slides = [
     image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2068&auto=format&fit=crop",
     details: {
       title: "Cuidado Profissional",
-      // Imagem do Veterinário
       coverImage: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=1932&auto=format&fit=crop", 
       sections: [
         {
@@ -55,8 +54,7 @@ const slides = [
     image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop",
     details: {
       title: "Spa & Estética",
-      // Imagem do Banho
-      coverImage: "/spa-estetica.jpg",
+      coverImage: "https://images.unsplash.com/photo-1596272875729-ed2c21d583e3?q=80&w=1974&auto=format&fit=crop",
       sections: [
         {
           heading: "Banho",
@@ -91,7 +89,6 @@ const slides = [
     image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?q=80&w=2070&auto=format&fit=crop",
     details: {
       title: "Boutique Pet",
-      // Imagem da Loja/Produtos
       coverImage: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2064&auto=format&fit=crop", 
       sections: [
         {
@@ -146,10 +143,9 @@ const WordReveal = ({ text, color }) => {
   );
 };
 
-// --- 3. COMPONENTE MODAL (COM PORTAL E ANIMAÇÃO DE SAÍDA) ---
+// --- 3. COMPONENTE MODAL (MOBILE PERFECT) ---
 
 const ServiceModal = ({ slide, isOpen, onClose }) => {
-  // Trava o scroll do body
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -172,31 +168,32 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
           className="fixed inset-0 z-[9999] flex items-center justify-center w-full h-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.3 } }} // Fade out suave no backdrop
+          exit={{ opacity: 0, transition: { duration: 0.3 } }}
           style={{ backgroundColor: theme.bg }}
         >
-          {/* Botão Fechar */}
+          {/* Botão Fechar - Fica fixo no topo direito */}
           <button 
             onClick={onClose}
-            className="absolute top-6 right-6 z-50 p-2 rounded-full hover:scale-110 transition-transform shadow-lg bg-white/20 backdrop-blur-md border border-white/30 cursor-pointer"
+            className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 rounded-full hover:scale-110 transition-transform shadow-lg bg-white/20 backdrop-blur-md border border-white/30 cursor-pointer"
             style={{ color: theme.text }}
           >
-            <X size={32} />
+            <X size={28} />
           </button>
 
           <motion.div 
-            className="w-full h-full flex flex-col md:flex-row"
+            // Layout: Flex-col-reverse no mobile (Imagem topo, Texto baixo) -> Flex-row no desktop
+            className="w-full h-full flex flex-col-reverse md:flex-row"
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
-            // NOVA ANIMAÇÃO DE SAÍDA: Desliza para baixo e diminui a opacidade
             exit={{ y: "100%", opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
           >
-            {/* LADO ESQUERDO: TEXTO (Com Scroll Personalizado) */}
+            
+            {/* LADO 1: TEXTO (Baixo no Mobile, Esquerda no Desktop) */}
             <div className="w-full md:w-1/2 h-full flex flex-col relative">
-               <div className="flex-1 overflow-y-auto px-8 md:px-20 py-12 md:py-24 custom-scrollbar">
+               <div className="flex-1 overflow-y-auto px-6 py-8 md:px-20 md:py-24 custom-scrollbar">
                   <motion.h2 
-                    className="text-5xl md:text-7xl font-black uppercase mb-12 tracking-tighter leading-none"
+                    className="text-4xl md:text-7xl font-black uppercase mb-8 md:mb-12 tracking-tighter leading-none"
                     style={{ color: theme.text }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -208,20 +205,20 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
                     </span>
                   </motion.h2>
 
-                  <div className="space-y-10 pb-10">
+                  <div className="space-y-8 md:space-y-10 pb-10">
                     {details.sections.map((section, idx) => (
                       <motion.div 
                         key={idx}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + (idx * 0.1) }}
-                        className="border-l-4 pl-6"
+                        className="border-l-4 pl-4 md:pl-6"
                         style={{ borderColor: theme.accent }}
                       >
-                        <h3 className="text-2xl font-bold uppercase mb-3" style={{ color: theme.text }}>
+                        <h3 className="text-xl md:text-2xl font-bold uppercase mb-2 md:mb-3" style={{ color: theme.text }}>
                           {section.heading}
                         </h3>
-                        <p className="text-base md:text-lg leading-relaxed font-medium opacity-90" style={{ color: theme.text }}>
+                        <p className="text-sm md:text-lg leading-relaxed font-medium opacity-90" style={{ color: theme.text }}>
                           {section.text}
                         </p>
                       </motion.div>
@@ -230,8 +227,8 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
                </div>
             </div>
 
-            {/* LADO DIREITO: IMAGEM (Fixa, cobrindo a área) */}
-            <div className="hidden md:block w-1/2 h-full relative overflow-hidden">
+            {/* LADO 2: IMAGEM (Topo no Mobile - 35% height, Direita no Desktop - 100% height) */}
+            <div className="block w-full h-[35vh] md:h-full md:w-1/2 relative overflow-hidden shrink-0">
               <motion.div 
                 className="w-full h-full"
                 initial={{ scale: 1.1 }}
@@ -242,12 +239,11 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
                 <img 
                   src={details.coverImage} 
                   alt={details.title} 
-                  // object-cover garante que a imagem cubra a área sem distorcer
                   className="w-full h-full object-cover" 
                 />
               </motion.div>
-              {/* "PetClin Premium Services" REMOVIDO DAQUI */}
             </div>
+
           </motion.div>
         </motion.div>
       )}
@@ -284,7 +280,7 @@ export default function Services() {
 
   return (
     <div 
-      className="relative w-full min-h-screen overflow-hidden flex flex-col border-[12px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans" 
+      className="relative w-full min-h-screen overflow-hidden flex flex-col border-[8px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans" 
       style={{ 
         backgroundColor: currentTheme.bg, 
         borderColor: '#ffffff',
@@ -292,17 +288,25 @@ export default function Services() {
       }}
     >
       
-      {/* NAVEGAÇÃO */}
-      <button onClick={handlePrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2" style={{ color: currentTheme.text }}>
-        <ArrowLeft size={48} strokeWidth={1.5} />
+      <button 
+        onClick={handlePrev} 
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group"
+        style={{ color: currentTheme.text }}
+      >
+        <ArrowLeft className="w-6 h-6 md:w-10 md:h-10 transition-transform group-hover:-translate-x-1" strokeWidth={2} />
       </button>
 
-      <button onClick={handleNext} className="absolute right-2 md:left-[55%] top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2" style={{ color: currentTheme.text }}>
-        <ArrowRight size={48} strokeWidth={1.5} />
+      <button 
+        onClick={handleNext} 
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group"
+        style={{ color: currentTheme.text }}
+      >
+        <ArrowRight className="w-6 h-6 md:w-10 md:h-10 transition-transform group-hover:translate-x-1" strokeWidth={2} />
       </button>
 
-      {/* CONTEÚDO PRINCIPAL */}
-      <div className="flex-1 container mx-auto flex items-center justify-center px-6 md:px-0 relative z-10">
+
+      {/* CONTEÚDO PRINCIPAL (Com padding horizontal extra para não encostar nas setas) */}
+      <div className="flex-1 container mx-auto flex items-center justify-center px-16 md:px-24 relative z-10">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentIndex}
@@ -312,11 +316,11 @@ export default function Services() {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="w-full grid md:grid-cols-12 gap-10 items-center h-full"
+            className="w-full grid md:grid-cols-12 gap-6 md:gap-10 items-center h-full pt-12 md:pt-0"
           >
             
-            {/* ESQUERDA */}
-            <div className="md:col-span-7 flex flex-col items-center text-center justify-center pt-8 md:pt-0">
+            {/* ESQUERDA - Texto */}
+            <div className="md:col-span-7 flex flex-col items-center text-center justify-center">
               <motion.div 
                 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                 className="mb-4 md:mb-8 border px-4 py-1.5 transition-colors duration-500 rounded-full"
@@ -326,7 +330,7 @@ export default function Services() {
               </motion.div>
 
               <div className="relative mb-6 flex flex-col items-center">
-                <div className="text-6xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" style={{ fontFamily: 'Impact, sans-serif' }}>
+                <div className="text-5xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" style={{ fontFamily: 'Impact, sans-serif' }}>
                   <LetterReveal text={currentSlide.nameLine1} color={currentTheme.text} customDelay={0} />
                   <LetterReveal text={currentSlide.nameLine2} color={currentTheme.text} customDelay={0.3} />
                 </div>
@@ -334,25 +338,25 @@ export default function Services() {
                   initial={{ opacity: 0, scale: 0.8, rotate: -15, x: 20 }}
                   animate={{ opacity: 1, scale: 1, rotate: -6, x: 0 }}
                   transition={{ delay: 0.8, type: "spring" }}
-                  className="absolute -bottom-4 -right-2 md:-right-8 z-10"
+                  className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-8 z-10"
                   style={{ color: currentTheme.accent, textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}
                 >
-                  <span className="font-serif italic text-4xl md:text-6xl font-bold tracking-tighter whitespace-nowrap">{currentSlide.scriptName}</span>
+                  <span className="font-serif italic text-3xl md:text-6xl font-bold tracking-tighter whitespace-nowrap">{currentSlide.scriptName}</span>
                 </motion.div>
               </div>
 
-              <div className="max-w-xl text-sm md:text-lg leading-relaxed font-medium mt-4 px-4 md:px-0">
+              <div className="max-w-xl text-sm md:text-lg leading-relaxed font-medium mt-2 px-2 md:px-0">
                 <WordReveal text={currentSlide.description} color={currentTheme.text} />
               </div>
             </div>
 
-            {/* DIREITA + BOTÃO ABRIR MODAL */}
-            <div className="md:col-span-5 h-[40vh] md:h-[75vh] w-full relative flex items-center justify-center pb-8 md:pb-0">
+            {/* DIREITA - Imagem + Botão */}
+            <div className="md:col-span-5 h-[35vh] md:h-[75vh] w-full relative flex items-center justify-center pb-8 md:pb-0">
                <motion.div 
                  initial={{ scale: 0.95, opacity: 0 }}
                  animate={{ scale: 1, opacity: 1 }}
                  transition={{ duration: 0.6, ease: "easeOut" }}
-                 className="relative w-full h-full border-[8px] md:border-[10px] z-20 overflow-hidden shadow-2xl rounded-sm"
+                 className="relative w-full h-full border-[6px] md:border-[10px] z-20 overflow-hidden shadow-2xl rounded-sm"
                  style={{ borderColor: currentTheme.border }}
                >
                  <img src={currentSlide.image} alt={currentSlide.category} className="w-full h-full object-cover" />
@@ -360,7 +364,7 @@ export default function Services() {
                  <div className="absolute top-0 right-0 p-0 m-0 z-30">
                      <button 
                        onClick={() => setIsModalOpen(true)}
-                       className="group px-6 py-3 text-xs md:text-sm font-black flex items-center gap-2 uppercase tracking-widest transition-all duration-300 hover:pr-8 cursor-pointer"
+                       className="group px-4 py-2 md:px-6 md:py-3 text-xs md:text-sm font-black flex items-center gap-2 uppercase tracking-widest transition-all duration-300 hover:pr-8 cursor-pointer"
                        style={{ 
                          backgroundColor: currentTheme.theme?.buttonBg || 'rgba(255,255,255,0.9)', 
                          color: currentTheme.theme?.buttonText || '#000',
@@ -389,7 +393,7 @@ export default function Services() {
          ))}
       </div>
 
-      {/* RENDERIZAÇÃO DO MODAL (Portal) */}
+      {/* MODAL */}
       <ServiceModal 
         slide={currentSlide} 
         isOpen={isModalOpen} 

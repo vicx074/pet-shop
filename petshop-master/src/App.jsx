@@ -2,7 +2,7 @@ import React from 'react';
 import SmoothScroll from './SmoothScroll'; 
 import Hero from './Hero';
 import Services from './Services'; 
-import Footer from './Footer'; // Importando o Footer novo
+import Footer from './Footer'; 
 
 function App() {
   return (
