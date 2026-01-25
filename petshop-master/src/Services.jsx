@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import { ArrowRight, ArrowLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const ServiceModal = React.lazy(() => import('./ServiceModal'));
 
 // --- 1. DADOS E CONFIGURAÇÕES ---
 const slides = [
@@ -53,7 +55,7 @@ const slides = [
     image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop",
     details: {
       title: "Spa & Estética",
-      coverImage: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop",
+      coverImage: "/spa-estetica.webp", 
       sections: [
         {
           heading: "Banho",
@@ -103,10 +105,10 @@ const slides = [
   }
 ];
 
-// --- 2. COMPONENTES AUXILIARES OTIMIZADOS ---
-const LetterReveal = React.memo(({ text, color, customDelay = 0 }) => {
+// --- 2. COMPONENTES AUXILIARES ---
+
+const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => {
   const letters = useMemo(() => text.split(""), [text]);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   
   if (isMobile) {
     return (
@@ -140,9 +142,7 @@ const LetterReveal = React.memo(({ text, color, customDelay = 0 }) => {
   );
 });
 
-const WordReveal = React.memo(({ text, color }) => {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  
+const WordReveal = React.memo(({ text, color, isMobile }) => {
   if (isMobile) {
     return (
       <motion.div 
@@ -176,173 +176,41 @@ const WordReveal = React.memo(({ text, color }) => {
   );
 });
 
-// --- 3. COMPONENTE MODAL OTIMIZADO E FUNCIONAL ---
-const ServiceModal = React.memo(({ slide, isOpen, onClose }) => {
-  const [modalImageLoaded, setModalImageLoaded] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      // Preload da imagem do modal quando abrir
-      if (slide?.details?.coverImage) {
-        const img = new Image();
-        img.src = slide.details.coverImage;
-        img.onload = () => setModalImageLoaded(true);
-      }
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      setModalImageLoaded(false);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-  }, [isOpen, slide]);
-
-  if (!slide || !isOpen) return null;
-  const { theme, details } = slide;
-
-  return (
-    <div className="fixed inset-0 z-[9999] w-full h-full" style={{ position: 'fixed' }}>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            key="modal-backdrop"
-            className="absolute inset-0 w-full h-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            style={{ backgroundColor: theme.bg, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          >
-            <button 
-              onClick={onClose}
-              className="fixed top-4 right-4 md:top-6 md:right-6 z-[10000] p-2 rounded-full hover:scale-110 transition-transform shadow-lg bg-white/20 backdrop-blur-md border border-white/30 cursor-pointer"
-              style={{ color: theme.text }}
-              aria-label="Fechar"
-            >
-              <X size={28} />
-            </button>
-
-            <motion.div 
-              className="w-full h-full flex flex-col-reverse md:flex-row overflow-hidden"
-              initial={{ y: "100%" }}
-              animate={{ y: "0%" }}
-              exit={{ y: "100%", opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              style={{ height: '100dvh' }}
-            >
-              
-              {/* LADO TEXTO */}
-              <div className="w-full md:w-1/2 h-[65vh] md:h-full flex flex-col relative overflow-hidden">
-                 <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-8 md:px-20 md:py-24" style={{ WebkitOverflowScrolling: 'touch' }}>
-                    <motion.h2 
-                      className="text-4xl md:text-7xl font-black uppercase mb-8 md:mb-12 tracking-tighter leading-none"
-                      style={{ color: theme.text }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      {details.title}
-                      <span className="block text-xl md:text-3xl font-serif italic normal-case mt-2 opacity-80" style={{ color: theme.accent }}>
-                        {slide.scriptName}
-                      </span>
-                    </motion.h2>
-
-                    <div className="space-y-8 md:space-y-10 pb-10">
-                      {details.sections.map((section, idx) => (
-                        <motion.div 
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.4 + (idx * 0.1) }}
-                          className="border-l-4 pl-4 md:pl-6"
-                          style={{ borderColor: theme.accent }}
-                        >
-                          <h3 className="text-xl md:text-2xl font-bold uppercase mb-2 md:mb-3" style={{ color: theme.text }}>
-                            {section.heading}
-                          </h3>
-                          <p className="text-sm md:text-lg leading-relaxed font-medium opacity-90" style={{ color: theme.text }}>
-                            {section.text}
-                          </p>
-                        </motion.div>
-                      ))}
-                    </div>
-                 </div>
-              </div>
-
-              {/* LADO IMAGEM */}
-              <div className="w-full h-[35vh] md:h-full md:w-1/2 relative overflow-hidden flex-shrink-0">
-                <motion.div 
-                  className="w-full h-full relative"
-                  initial={{ scale: 1.1 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1.5 }}
-                >
-                  <div className="absolute inset-0 bg-black/20 z-10"></div>
-                  {modalImageLoaded ? (
-                    <img 
-                      src={details.coverImage} 
-                      alt={details.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
-                      <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: theme.text, borderTopColor: 'transparent' }}></div>
-                    </div>
-                  )}
-                </motion.div>
-              </div>
-
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-});
-
-// --- 4. COMPONENTE PRINCIPAL ---
+// --- 3. COMPONENTE PRINCIPAL ---
 export default function Services() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (isModalOpen) return; 
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'ArrowLeft') handlePrev();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
 
   const currentSlide = slides[currentIndex];
   const currentTheme = currentSlide.theme;
 
-  // Preload AGRESSIVO da primeira imagem
   useEffect(() => {
-    if (isFirstRender) {
-      const img = new Image();
-      img.fetchPriority = 'high';
-      img.src = slides[0].image;
-      img.onload = () => {
-        setImageLoaded(true);
-        setIsFirstRender(false);
-      };
-      
-      const timeout = setTimeout(() => {
-        setImageLoaded(true);
-        setIsFirstRender(false);
-      }, 2000);
-      
-      return () => clearTimeout(timeout);
-    } else {
-      setImageLoaded(false);
-      const img = new Image();
-      img.src = currentSlide.image;
-      img.onload = () => setImageLoaded(true);
-    }
-  }, [currentIndex, isFirstRender, currentSlide.image]);
+    setImageLoaded(false);
+    const img = new Image();
+    img.src = currentSlide.image;
+    img.onload = () => setImageLoaded(true);
+    if (img.complete) setImageLoaded(true);
+  }, [currentIndex, currentSlide.image]);
 
   const handleNext = () => {
     setDirection(1);
@@ -354,44 +222,36 @@ export default function Services() {
     setCurrentIndex((prev) => (prev - 1) < 0 ? slides.length - 1 : prev - 1);
   };
 
-  const pageVariants = useMemo(() => ({
-    initial: (direction) => ({ x: direction > 0 ? 100 : -100, opacity: 0 }),
+  const pageVariants = {
+    initial: (direction) => ({ x: direction > 0 ? '100%' : '-100%', opacity: 0 }),
     animate: { x: 0, opacity: 1 },
-    exit: (direction) => ({ x: direction < 0 ? 100 : -100, opacity: 0 })
-  }), []);
+    exit: (direction) => ({ x: direction < 0 ? '100%' : '-100%', opacity: 0 })
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset, velocity) => Math.abs(offset) * velocity;
 
   return (
     <div 
-      className="relative w-full min-h-screen overflow-hidden flex flex-col border-[8px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans" 
+      className="relative w-full min-h-screen overflow-hidden flex flex-col border-[8px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans select-none" 
       style={{ 
         backgroundColor: currentTheme.bg, 
         borderColor: '#ffffff',
         boxSizing: 'border-box',
-        willChange: 'background-color'
       }}
     >
-      
-      <button 
-        onClick={handlePrev} 
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group"
-        style={{ color: currentTheme.text }}
-        aria-label="Anterior"
-      >
+      {/* Botões de Navegação Desktop */}
+      <button onClick={handlePrev} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group hidden md:block" style={{ color: currentTheme.text }}>
         <ArrowLeft className="w-6 h-6 md:w-10 md:h-10 transition-transform group-hover:-translate-x-1" strokeWidth={2} />
       </button>
 
-      <button 
-        onClick={handleNext} 
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group"
-        style={{ color: currentTheme.text }}
-        aria-label="Próximo"
-      >
+      <button onClick={handleNext} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all border border-white/20 shadow-lg group hidden md:block" style={{ color: currentTheme.text }}>
         <ArrowRight className="w-6 h-6 md:w-10 md:h-10 transition-transform group-hover:translate-x-1" strokeWidth={2} />
       </button>
 
-      {/* CONTEÚDO PRINCIPAL */}
-      <div className="flex-1 container mx-auto flex items-center justify-center px-16 md:px-24 relative z-10">
-        <AnimatePresence mode="wait" custom={direction}>
+      {/* CONTEÚDO */}
+      <div className="flex-1 container mx-auto flex items-center justify-center px-6 md:px-24 relative z-10">
+        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
           <motion.div
             key={currentIndex}
             custom={direction}
@@ -399,12 +259,19 @@ export default function Services() {
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="w-full grid md:grid-cols-12 gap-6 md:gap-10 items-center h-full pt-12 md:pt-0"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={1}
+            onDragEnd={(e, { offset, velocity }) => {
+              const swipe = swipePower(offset.x, velocity.x);
+              if (swipe < -swipeConfidenceThreshold) handleNext();
+              else if (swipe > swipeConfidenceThreshold) handlePrev();
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="w-full grid md:grid-cols-12 gap-6 md:gap-10 items-center h-full pt-12 md:pt-0 cursor-grab active:cursor-grabbing"
           >
-            
             {/* ESQUERDA - Texto */}
-            <div className="md:col-span-7 flex flex-col items-center text-center justify-center">
+            <div className="md:col-span-7 flex flex-col items-center text-center justify-center pointer-events-none md:pointer-events-auto">
               <motion.div 
                 initial={{ opacity: 0, y: -20 }} 
                 animate={{ opacity: 1, y: 0 }} 
@@ -419,8 +286,8 @@ export default function Services() {
 
               <div className="relative mb-6 flex flex-col items-center">
                 <div className="text-5xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" style={{ fontFamily: 'Impact, sans-serif' }}>
-                  <LetterReveal text={currentSlide.nameLine1} color={currentTheme.text} customDelay={0} />
-                  <LetterReveal text={currentSlide.nameLine2} color={currentTheme.text} customDelay={0.3} />
+                  <LetterReveal text={currentSlide.nameLine1} color={currentTheme.text} customDelay={0} isMobile={isMobile} />
+                  <LetterReveal text={currentSlide.nameLine2} color={currentTheme.text} customDelay={0.3} isMobile={isMobile} />
                 </div>
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.8, rotate: -15, x: 20 }}
@@ -436,80 +303,62 @@ export default function Services() {
               </div>
 
               <div className="max-w-xl text-sm md:text-lg leading-relaxed font-medium mt-2 px-2 md:px-0">
-                <WordReveal text={currentSlide.description} color={currentTheme.text} />
+                <WordReveal text={currentSlide.description} color={currentTheme.text} isMobile={isMobile} />
               </div>
             </div>
 
             {/* DIREITA - Imagem + Botão */}
             <div className="md:col-span-5 h-[35vh] md:h-[75vh] w-full relative flex items-center justify-center pb-8 md:pb-0">
                <motion.div 
-                 initial={{ scale: 0.95, opacity: 0 }}
-                 animate={{ scale: 1, opacity: 1 }}
-                 transition={{ duration: 0.6, ease: "easeOut" }}
-                 className="relative w-full h-full border-[6px] md:border-[10px] z-20 overflow-hidden shadow-2xl rounded-sm"
+                 className="relative w-full h-full border-[6px] md:border-[10px] z-20 overflow-hidden shadow-2xl rounded-sm bg-white/10"
                  style={{ borderColor: currentTheme.border }}
                >
-                 {imageLoaded ? (
+                 {imageLoaded && (
                    <img 
                      src={currentSlide.image} 
                      alt={currentSlide.category}
                      width="800"
                      height="600"
-                     fetchpriority={currentIndex === 0 ? "high" : "auto"}
-                     loading={currentIndex === 0 ? "eager" : "lazy"}
                      decoding="async"
-                     className="w-full h-full object-cover" 
-                     style={{ contentVisibility: 'auto' }}
+                     className="w-full h-full object-cover pointer-events-none"
                    />
-                 ) : (
-                   <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: currentTheme.bg }}>
-                     <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: currentTheme.text, borderTopColor: 'transparent' }}></div>
-                   </div>
                  )}
                  
-                 <div className="absolute top-0 right-0 p-0 m-0 z-30">
+                 <div className="absolute top-0 right-0 p-0 m-0 z-30 pointer-events-auto"> 
                      <button 
-                       onClick={() => setIsModalOpen(true)}
+                       onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }} 
                        className="group px-4 py-2 md:px-6 md:py-3 text-xs md:text-sm font-black flex items-center gap-2 uppercase tracking-widest transition-all duration-300 hover:pr-8 cursor-pointer"
-                       style={{ 
-                         backgroundColor: currentTheme.buttonBg, 
-                         color: currentTheme.buttonText,
-                         borderBottomLeftRadius: '8px'
-                       }}
-                       aria-label="Ver detalhes do serviço"
+                       style={{ backgroundColor: currentTheme.buttonBg, color: currentTheme.buttonText, borderBottomLeftRadius: '8px' }}
                      >
-                       VER DETALHES 
-                       <Plus size={16} strokeWidth={3} className="transition-transform duration-300 group-hover:rotate-90" />
+                       VER DETALHES <Plus size={16} strokeWidth={3} className="transition-transform duration-300 group-hover:rotate-90" />
                      </button>
                  </div>
                </motion.div>
             </div>
-
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* PAGINAÇÃO */}
-      <div className="absolute bottom-6 left-10 right-10 flex gap-3 z-20">
+      <div className="absolute bottom-6 left-10 right-10 flex gap-3 z-20 justify-center">
          {slides.map((_, idx) => (
-            <div 
+            <button 
               key={idx}
-              className="h-2 flex-1 rounded-full transition-all duration-300"
-              style={{ 
-                backgroundColor: idx === currentIndex 
-                  ? (currentTheme.text === '#ffffff' ? '#ffffff' : currentTheme.border) 
-                  : (currentTheme.text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)') 
-              }}
+              onClick={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
+              className="h-2 flex-1 rounded-full transition-all duration-300 cursor-pointer hover:h-3"
+              style={{ backgroundColor: idx === currentIndex ? (currentTheme.text === '#ffffff' ? '#ffffff' : currentTheme.border) : (currentTheme.text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)') }}
             />
          ))}
       </div>
 
-      {/* MODAL - SEMPRE RENDERIZADO PARA FUNCIONAR */}
-      <ServiceModal 
-        slide={currentSlide} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      {/* MODAL COM SUSPENSE PARA LAZY LOADING */}
+      <Suspense fallback={null}>
+        <ServiceModal 
+          slide={currentSlide} 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+        />
+      </Suspense>
 
     </div>
   );
