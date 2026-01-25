@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
+
 export default function SmoothScroll({ children }) {
   const scrollRef = useRef(null);
   const requestRef = useRef(null);

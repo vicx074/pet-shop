@@ -12,3 +12,45 @@ html.lenis {
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+@layer utilities {
+  /* 1. LARGURA MINÚSCULA */
+  ::-webkit-scrollbar {
+    width: 4px; /* Quase um fio de cabelo */
+  }
+
+  /* 2. TRILHO INVISÍVEL (Mais escondida impossível) */
+  ::-webkit-scrollbar-track {
+    background: transparent; 
+  }
+
+  /* 3. AS 3 CORES + VISUAL "CORTADINHO" */
+  ::-webkit-scrollbar-thumb {
+    /* O Segredo: Um gradiente que passa pelas 3 cores */
+    background: linear-gradient(
+      180deg, 
+      #006400 0%,   /* Começa Verde Escuro (topo) */
+      #FF8C00 50%,  /* O meio é o Laranja Vibrante */
+      #ffffff 100%  /* Termina Branco (ponta de baixo) */
+    );
+
+    /* "Cortadinho" nas pontas (Zero arredondamento) */
+    border-radius: 0px; 
+    
+    /* Um truque para ela parecer "flutuar" solta */
+    border-top: 20px solid transparent; 
+    border-bottom: 20px solid transparent;
+    background-clip: content-box; 
+  }
+
+  /* REAÇÃO AO MOUSE */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #FF8C00; /* Fica toda laranja para indicar que pode clicar */
+    width: 6px; /* Engrossa levemente para facilitar o clique */
+  }
+
+  /* Compatibilidade Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #FF8C00 transparent;
+  }
+}
