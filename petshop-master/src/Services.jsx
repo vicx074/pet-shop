@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { ArrowRight, ArrowLeft, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- DADOS E CONFIGURAÇÕES DE TEMA ---
+// --- 1. DADOS E CONFIGURAÇÕES ---
 const slides = [
   {
     id: 1,
-    // Tema 1: Clínica (Verde Institucional)
     theme: {
-      bg: "#008000",       
-      text: "#ffffff",     
-      accent: "#FF8C00",   // Laranja (Script e detalhes)
+      bg: "#008000",
+      text: "#ffffff",
+      accent: "#FF8C00",
       border: "#FF8C00",
       buttonText: "#008000",
       buttonBg: "#ffffff"
@@ -20,15 +20,29 @@ const slides = [
     nameLine2: "VETERINÁRIA",
     scriptName: "excelência",
     description: "Oferecemos em nossa estrutura salas de atendimento amplas e climatizadas, internamento monitorado e sala de cirurgia com todo suporte necessário.",
-    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2068&auto=format&fit=crop", 
+    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2068&auto=format&fit=crop",
+    details: {
+      title: "Cuidado Profissional",
+      // Imagem do Veterinário
+      coverImage: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=1932&auto=format&fit=crop", 
+      sections: [
+        {
+          heading: "Atendimento Clínico",
+          text: "A nossa clínica veterinária conta com ambientes climatizados e equipamentos modernos, que nos permitem proporcionar um atendimento diferenciado ao seu animal."
+        },
+        {
+          heading: "A Equipe",
+          text: "O corpo de veterinários de nossa clínica é formado por profissionais capacitados e que amam o que fazem. Você pode ter a certeza e a tranquilidade de que eles irão tratar o seu animal com muito respeito e carinho."
+        }
+      ]
+    }
   },
   {
     id: 2,
-    // Tema 2: Banho e Tosa (Bege Clean)
     theme: {
-      bg: "#F5F5DC",       
-      text: "#003300",     // Verde escuro fechado (Melhor contraste)
-      accent: "#FF8C00",   
+      bg: "#F5F5DC",
+      text: "#003300",
+      accent: "#FF8C00",
       border: "#006400",
       buttonText: "#ffffff",
       buttonBg: "#006400"
@@ -38,15 +52,33 @@ const slides = [
     nameLine2: "& TOSA",
     scriptName: "cuidado",
     description: "Nosso salão de beleza animal está cheio de novidades! Banhos, hidratações e tosas especiais (higiênica, padrão e na tesoura).",
-    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop", 
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop",
+    details: {
+      title: "Spa & Estética",
+      // Imagem do Banho
+      coverImage: "/spa-estetica.jpg",
+      sections: [
+        {
+          heading: "Banho",
+          text: "O nosso salão de beleza animal oferece os mais diversos tipos de banhos para a higiene e conforto do seu pet. Banhos calmantes, hidratações e tratamentos diferenciados. Traga o seu pet para relaxar com a gente!"
+        },
+        {
+          heading: "Tosa",
+          text: "A tosa é realizada tanto para estética, quanto para a higiene do seu animal. Nossos profissionais são habilitados para diversas modalidades de tosa, utilizando a máquina ou a tesoura."
+        },
+        {
+          heading: "Transporte",
+          text: "Se você não puder trazer seu animal até a nossa clínica, nós fazemos isso para você. É só entrar em contato conosco."
+        }
+      ]
+    }
   },
   {
     id: 3,
-    // Tema 3: Petshop (Laranja Vibrante)
     theme: {
-      bg: "#FF8C00",       
-      text: "#ffffff",     
-      accent: "#006400",   // Verde escuro (Script)
+      bg: "#FF8C00",
+      text: "#ffffff",
+      accent: "#006400",
       border: "#ffffff",
       buttonText: "#FF8C00",
       buttonBg: "#ffffff"
@@ -56,90 +88,181 @@ const slides = [
     nameLine2: "& FARMÁCIA",
     scriptName: "tudo pro seu pet",
     description: "Um ambiente organizado onde você encontra tudo para o dia-a-dia. Ampla variedade de produtos da mais alta qualidade e farmácia completa.",
-    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?q=80&w=2070&auto=format&fit=crop", 
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?q=80&w=2070&auto=format&fit=crop",
+    details: {
+      title: "Boutique Pet",
+      // Imagem da Loja/Produtos
+      coverImage: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2064&auto=format&fit=crop", 
+      sections: [
+        {
+          heading: "Loja",
+          text: "A nossa loja conta com diversos artigos que vão fazer a alegria do seu pet. Caminhas, coleiras, sapatos, travesseiros e dezenas de brinquedos. E tudo isso em um ambiente agradável e acessorado."
+        },
+        {
+          heading: "Farmácia",
+          text: "Na farmácia da nossa clínica você encontrará tudo o que você precisa para ajudar a manter a saúde de seu animal. Contamos com um mix de medicamentos diferenciados com o melhor preço."
+        }
+      ]
+    }
   }
 ];
 
-// --- COMPONENTES VISUAIS (ANIMAÇÕES DE TEXTO) ---
-
-// Efeito Cascata: Letra por Letra (Usado no Título)
+// --- 2. COMPONENTES AUXILIARES ---
 const LetterReveal = ({ text, color, customDelay = 0 }) => {
   const letters = text.split("");
-  
   const container = {
     hidden: { opacity: 0 },
-    visible: (i = 1) => ({ 
-      opacity: 1, 
-      transition: { staggerChildren: 0.04, delayChildren: 0.2 + customDelay } 
-    })
+    visible: (i = 1) => ({ opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.2 + customDelay } })
   };
-
   const child = {
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { type: "spring", damping: 12, stiffness: 100 } 
-    },
-    hidden: { 
-      opacity: 0, 
-      y: 40, // Vem de baixo
-      transition: { type: "spring", damping: 12, stiffness: 100 } 
-    }
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 40, transition: { type: "spring", damping: 12, stiffness: 100 } }
   };
-
   return (
     <motion.div style={{ display: "flex", overflow: "hidden" }} variants={container} initial="hidden" animate="visible">
       {letters.map((letter, index) => (
-        <motion.span variants={child} key={index} style={{ color }}>
-          {letter === " " ? "\u00A0" : letter}
-        </motion.span>
+        <motion.span variants={child} key={index} style={{ color }}>{letter === " " ? "\u00A0" : letter}</motion.span>
       ))}
     </motion.div>
   );
 };
 
-// Efeito Cascata: Palavra por Palavra 
 const WordReveal = ({ text, color }) => {
   const words = text.split(" ");
-
   const container = {
     hidden: { opacity: 0 },
-    visible: (i = 1) => ({ 
-      opacity: 1, 
-      transition: { staggerChildren: 0.05, delayChildren: 0.6 } 
-    })
+    visible: (i = 1) => ({ opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.6 } })
   };
-
   const child = {
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { type: "spring", damping: 12, stiffness: 100 } 
-    },
-    hidden: { 
-      opacity: 0, 
-      y: 20, 
-      transition: { type: "spring", damping: 12, stiffness: 100 } 
-    }
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 20, transition: { type: "spring", damping: 12, stiffness: 100 } }
   };
-
   return (
     <motion.div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }} variants={container} initial="hidden" animate="visible">
       {words.map((word, index) => (
-        <motion.span variants={child} key={index} style={{ color, marginRight: "0.3em" }}>
-          {word}
-        </motion.span>
+        <motion.span variants={child} key={index} style={{ color, marginRight: "0.3em" }}>{word}</motion.span>
       ))}
     </motion.div>
   );
 };
 
-// --- COMPONENTE PRINCIPAL ---
-export default function PetClinPortfolioSlider() {
+// --- 3. COMPONENTE MODAL (COM PORTAL E ANIMAÇÃO DE SAÍDA) ---
+
+const ServiceModal = ({ slide, isOpen, onClose }) => {
+  // Trava o scroll do body
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!slide || !isOpen) return null;
+  const { theme, details } = slide;
+
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="modal-backdrop"
+          className="fixed inset-0 z-[9999] flex items-center justify-center w-full h-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.3 } }} // Fade out suave no backdrop
+          style={{ backgroundColor: theme.bg }}
+        >
+          {/* Botão Fechar */}
+          <button 
+            onClick={onClose}
+            className="absolute top-6 right-6 z-50 p-2 rounded-full hover:scale-110 transition-transform shadow-lg bg-white/20 backdrop-blur-md border border-white/30 cursor-pointer"
+            style={{ color: theme.text }}
+          >
+            <X size={32} />
+          </button>
+
+          <motion.div 
+            className="w-full h-full flex flex-col md:flex-row"
+            initial={{ y: "100%" }}
+            animate={{ y: "0%" }}
+            // NOVA ANIMAÇÃO DE SAÍDA: Desliza para baixo e diminui a opacidade
+            exit={{ y: "100%", opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            {/* LADO ESQUERDO: TEXTO (Com Scroll Personalizado) */}
+            <div className="w-full md:w-1/2 h-full flex flex-col relative">
+               <div className="flex-1 overflow-y-auto px-8 md:px-20 py-12 md:py-24 custom-scrollbar">
+                  <motion.h2 
+                    className="text-5xl md:text-7xl font-black uppercase mb-12 tracking-tighter leading-none"
+                    style={{ color: theme.text }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    {details.title}
+                    <span className="block text-xl md:text-3xl font-serif italic normal-case mt-2 opacity-80" style={{ color: theme.accent }}>
+                      {slide.scriptName}
+                    </span>
+                  </motion.h2>
+
+                  <div className="space-y-10 pb-10">
+                    {details.sections.map((section, idx) => (
+                      <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + (idx * 0.1) }}
+                        className="border-l-4 pl-6"
+                        style={{ borderColor: theme.accent }}
+                      >
+                        <h3 className="text-2xl font-bold uppercase mb-3" style={{ color: theme.text }}>
+                          {section.heading}
+                        </h3>
+                        <p className="text-base md:text-lg leading-relaxed font-medium opacity-90" style={{ color: theme.text }}>
+                          {section.text}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+               </div>
+            </div>
+
+            {/* LADO DIREITO: IMAGEM (Fixa, cobrindo a área) */}
+            <div className="hidden md:block w-1/2 h-full relative overflow-hidden">
+              <motion.div 
+                className="w-full h-full"
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.5 }}
+              >
+                <div className="absolute inset-0 bg-black/20 z-10"></div>
+                <img 
+                  src={details.coverImage} 
+                  alt={details.title} 
+                  // object-cover garante que a imagem cubra a área sem distorcer
+                  className="w-full h-full object-cover" 
+                />
+              </motion.div>
+              {/* "PetClin Premium Services" REMOVIDO DAQUI */}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+};
+
+// --- 4. COMPONENTE PRINCIPAL ---
+
+export default function Services() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handlers de Navegação
   const handleNext = () => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) === slides.length ? 0 : prev + 1);
@@ -153,7 +276,6 @@ export default function PetClinPortfolioSlider() {
   const currentSlide = slides[currentIndex];
   const currentTheme = currentSlide.theme;
 
-  // Variantes de Transição de Slide
   const pageVariants = {
     initial: (direction) => ({ x: direction > 0 ? 100 : -100, opacity: 0 }),
     animate: { x: 0, opacity: 1 },
@@ -165,29 +287,21 @@ export default function PetClinPortfolioSlider() {
       className="relative w-full min-h-screen overflow-hidden flex flex-col border-[12px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans" 
       style={{ 
         backgroundColor: currentTheme.bg, 
-        borderColor: '#ffffff', // Borda Externa Branca Fixa
+        borderColor: '#ffffff',
         boxSizing: 'border-box' 
       }}
     >
       
-      {/* --- NAVEGAÇÃO LATERAL (SETAS) --- */}
-      <button 
-        onClick={handlePrev}
-        className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2"
-        style={{ color: currentTheme.text }}
-      >
+      {/* NAVEGAÇÃO */}
+      <button onClick={handlePrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2" style={{ color: currentTheme.text }}>
         <ArrowLeft size={48} strokeWidth={1.5} />
       </button>
 
-      <button 
-        onClick={handleNext}
-        className="absolute right-2 md:left-[55%] top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2"
-        style={{ color: currentTheme.text }}
-      >
+      <button onClick={handleNext} className="absolute right-2 md:left-[55%] top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2" style={{ color: currentTheme.text }}>
         <ArrowRight size={48} strokeWidth={1.5} />
       </button>
 
-      {/* --- ÁREA DE CONTEÚDO CENTRAL --- */}
+      {/* CONTEÚDO PRINCIPAL */}
       <div className="flex-1 container mx-auto flex items-center justify-center px-6 md:px-0 relative z-10">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -201,31 +315,21 @@ export default function PetClinPortfolioSlider() {
             className="w-full grid md:grid-cols-12 gap-10 items-center h-full"
           >
             
-            {/* COLUNA ESQUERDA: TEXTO E INFO */}
+            {/* ESQUERDA */}
             <div className="md:col-span-7 flex flex-col items-center text-center justify-center pt-8 md:pt-0">
-              
-              {/* Tag Categoria */}
               <motion.div 
                 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                 className="mb-4 md:mb-8 border px-4 py-1.5 transition-colors duration-500 rounded-full"
                 style={{ borderColor: currentTheme.text }}
               >
-                <span className="text-xs md:text-sm tracking-[0.25em] font-bold uppercase" style={{ color: currentTheme.text }}>
-                  {currentSlide.category}
-                </span>
+                <span className="text-xs md:text-sm tracking-[0.25em] font-bold uppercase" style={{ color: currentTheme.text }}>{currentSlide.category}</span>
               </motion.div>
 
-              {/* Bloco de Título Principal */}
               <div className="relative mb-6 flex flex-col items-center">
-                <div 
-                  className="text-6xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" 
-                  style={{ fontFamily: 'Impact, sans-serif' }}
-                >
+                <div className="text-6xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" style={{ fontFamily: 'Impact, sans-serif' }}>
                   <LetterReveal text={currentSlide.nameLine1} color={currentTheme.text} customDelay={0} />
                   <LetterReveal text={currentSlide.nameLine2} color={currentTheme.text} customDelay={0.3} />
                 </div>
-
-                {/* Texto Cursivo (Script) - Canto Inferior Direito */}
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.8, rotate: -15, x: 20 }}
                   animate={{ opacity: 1, scale: 1, rotate: -6, x: 0 }}
@@ -233,39 +337,29 @@ export default function PetClinPortfolioSlider() {
                   className="absolute -bottom-4 -right-2 md:-right-8 z-10"
                   style={{ color: currentTheme.accent, textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}
                 >
-                  <span className="font-serif italic text-4xl md:text-6xl font-bold tracking-tighter whitespace-nowrap">
-                    {currentSlide.scriptName}
-                  </span>
+                  <span className="font-serif italic text-4xl md:text-6xl font-bold tracking-tighter whitespace-nowrap">{currentSlide.scriptName}</span>
                 </motion.div>
               </div>
 
-              {/* Descrição */}
               <div className="max-w-xl text-sm md:text-lg leading-relaxed font-medium mt-4 px-4 md:px-0">
                 <WordReveal text={currentSlide.description} color={currentTheme.text} />
               </div>
-
             </div>
 
-            {/* COLUNA DIREITA: IMAGEM + BOTÃO */}
+            {/* DIREITA + BOTÃO ABRIR MODAL */}
             <div className="md:col-span-5 h-[40vh] md:h-[75vh] w-full relative flex items-center justify-center pb-8 md:pb-0">
                <motion.div 
                  initial={{ scale: 0.95, opacity: 0 }}
                  animate={{ scale: 1, opacity: 1 }}
                  transition={{ duration: 0.6, ease: "easeOut" }}
-                 // Borda mais fina (md:border-[10px]) para suavizar
                  className="relative w-full h-full border-[8px] md:border-[10px] z-20 overflow-hidden shadow-2xl rounded-sm"
                  style={{ borderColor: currentTheme.border }}
                >
-                  {/* Imagem */}
-                  <img 
-                    src={currentSlide.image} 
-                    alt={currentSlide.category} 
-                    className="w-full h-full object-cover"
-                  />
-                  
-                  {/* Botão de Ação (Canto Superior Direito) */}
-                  <div className="absolute top-0 right-0 p-0 m-0 z-30">
+                 <img src={currentSlide.image} alt={currentSlide.category} className="w-full h-full object-cover" />
+                 
+                 <div className="absolute top-0 right-0 p-0 m-0 z-30">
                      <button 
+                       onClick={() => setIsModalOpen(true)}
                        className="group px-6 py-3 text-xs md:text-sm font-black flex items-center gap-2 uppercase tracking-widest transition-all duration-300 hover:pr-8 cursor-pointer"
                        style={{ 
                          backgroundColor: currentTheme.theme?.buttonBg || 'rgba(255,255,255,0.9)', 
@@ -273,10 +367,10 @@ export default function PetClinPortfolioSlider() {
                          borderBottomLeftRadius: '8px'
                        }}
                      >
-                        VER DETALHES 
-                        <Plus size={16} strokeWidth={3} className="transition-transform duration-300 group-hover:rotate-90" />
+                       VER DETALHES 
+                       <Plus size={16} strokeWidth={3} className="transition-transform duration-300 group-hover:rotate-90" />
                      </button>
-                  </div>
+                 </div>
                </motion.div>
             </div>
 
@@ -284,20 +378,23 @@ export default function PetClinPortfolioSlider() {
         </AnimatePresence>
       </div>
 
-      {/* --- PAGINAÇÃO INFERIOR --- */}
+      {/* PAGINAÇÃO */}
       <div className="absolute bottom-6 left-10 right-10 flex gap-3 z-20">
          {slides.map((_, idx) => (
             <div 
               key={idx}
               className="h-2 flex-1 rounded-full transition-all duration-300"
-              style={{ 
-                backgroundColor: idx === currentIndex 
-                  ? (currentTheme.text === '#ffffff' ? '#ffffff' : currentTheme.border) 
-                  : (currentTheme.text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)')
-              }}
+              style={{ backgroundColor: idx === currentIndex ? (currentTheme.text === '#ffffff' ? '#ffffff' : currentTheme.border) : (currentTheme.text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)') }}
             />
          ))}
       </div>
+
+      {/* RENDERIZAÇÃO DO MODAL (Portal) */}
+      <ServiceModal 
+        slide={currentSlide} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
 
     </div>
   );

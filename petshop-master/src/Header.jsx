@@ -28,7 +28,7 @@ export default function Header() {
             <img 
               src="/petclin-removebg-preview.png" 
               alt="PetClin Logo" 
-              className="h-12 md:h-16 w-auto object-contain"
+              className="h-14 md:h-20 w-auto object-contain"
             />
           </a>
         </div>
