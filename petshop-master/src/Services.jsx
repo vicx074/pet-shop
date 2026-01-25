@@ -54,7 +54,7 @@ const slides = [
     image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop",
     details: {
       title: "Spa & Estética",
-      coverImage: "https://images.unsplash.com/photo-1596272875729-ed2c21d583e3?q=80&w=1974&auto=format&fit=crop",
+      coverImage: "/spa-estetica.jpg",
       sections: [
         {
           heading: "Banho",
