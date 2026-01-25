@@ -1,154 +1,262 @@
-import React, { useRef } from 'react';
-import { useScroll, useTransform, motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, ArrowLeft, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const servicesData = [
+// --- CONFIGURAÇÃO DOS DADOS REAIS ---
+const slides = [
   {
     id: 1,
-    title: "CONSULTAS &",
-    titleSecondLine: "CHECK-UPS",
-    subtitle: "PREVENÇÃO",
-    description: "Diagnósticos precisos para garantir a longevidade do seu pet antes que problemas se tornem graves.",
-    detailsTitle: "COMO FUNCIONA",
-    detailsPoints: ["Agendamento prévio.", "Análise clínica completa.", "Histórico revisado.", "Retorno em 15 dias."],
-    theme: "orange", // Laranja
-    color: "#FF8C00"
+    theme: {
+      bg: "#008000",       
+      text: "#ffffff",     
+      accent: "#FF8C00",   // Laranja para o script
+      border: "#FF8C00",
+      buttonText: "#008000",
+      buttonBg: "#ffffff"
+    },
+    category: "ESTRUTURA",
+    nameLine1: "CLÍNICA",
+    nameLine2: "VETERINÁRIA",
+    scriptName: "excelência",
+    description: "Oferecemos em nossa estrutura salas de atendimento amplas e climatizadas, internamento monitorado e sala de cirurgia com todo suporte necessário.",
+    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2068&auto=format&fit=crop", // Foto de Consultório/Vet
   },
   {
     id: 2,
-    title: "CIRURGIAS &",
-    titleSecondLine: "INTERNAMENTO",
-    subtitle: "HOSPITALAR",
-    description: "Centro cirúrgico avançado com monitoramento 24h e baias individuais climatizadas.",
-    detailsTitle: "SEGURANÇA TOTAL",
-    detailsPoints: ["Monitoramento veterinário 24h.", "Exames pré-cirúrgicos.", "Ambiente estéril.", "Boletim via WhatsApp."],
-    theme: "green", // Verde
-    color: "#007a00"
+    // TEMA 2: BANHO E TOSA (Bege Clean)
+    theme: {
+      bg: "#F5F5DC",       
+      text: "#006400",     // Verde Escuro para contraste no bege
+      accent: "#FF8C00",   // Laranja vibrante para o script
+      border: "#006400",
+      buttonText: "#ffffff",
+      buttonBg: "#006400"
+    },
+    category: "ESTÉTICA",
+    nameLine1: "BANHO",
+    nameLine2: "& TOSA",
+    scriptName: "cuidado",
+    description: "Nosso salão de beleza animal está cheio de novidades! Banhos, hidratações e tosas especiais (higiênica, padrão e na tesoura).",
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop", // Foto de Banho/Tosa
   },
   {
     id: 3,
-    title: "VACINAS &",
-    titleSecondLine: "LABORATÓRIO",
-    subtitle: "IMUNIZAÇÃO",
-    description: "Laboratório próprio para exames rápidos e vacinas importadas de alta qualidade.",
-    detailsTitle: "PROCEDIMENTO",
-    detailsPoints: ["Vacinas Importadas.", "Resultados rápidos.", "Coleta domiciliar.", "Carteirinha digital."],
-    theme: "orange", // Laranja
-    color: "#FF8C00"
+    // TEMA 3: PETSHOP (Laranja Vibrante)
+    theme: {
+      bg: "#FF8C00",       
+      text: "#ffffff",     
+      accent: "#006400",   // Verde Escuro para o script
+      border: "#ffffff",
+      buttonText: "#FF8C00",
+      buttonBg: "#ffffff"
+    },
+    category: "LOJA",
+    nameLine1: "PETSHOP",
+    nameLine2: "& FARMÁCIA",
+    scriptName: "tudo pro seu pet",
+    description: "Um ambiente organizado onde você encontra tudo para o dia-a-dia. Ampla variedade de produtos da mais alta qualidade e farmácia completa.",
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?q=80&w=2070&auto=format&fit=crop", // Foto de loja/brinquedos
   }
 ];
 
-// COMPONENTE DO CARD INDIVIDUAL
-const Card = ({ i, title, titleSecondLine, subtitle, description, detailsTitle, detailsPoints, color, progress, range, targetScale }) => {
-  const container = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: container,
-    offset: ['start end', 'start start']
-  });
+// --- COMPONENTES DE ANIMAÇÃO ---
 
-  // Animação de escala: O card diminui levemente quando o próximo sobe
-  const imageScale = useTransform(scrollYProgress, [0, 1], [2, 1]);
-  const scale = useTransform(progress, range, [1, targetScale]);
+const LetterReveal = ({ text, color, customDelay = 0 }) => {
+  const letters = text.split("");
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({ opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.2 + customDelay } })
+  };
+  const child = {
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 40, transition: { type: "spring", damping: 12, stiffness: 100 } }
+  };
+  return (
+    <motion.div style={{ display: "flex", overflow: "hidden" }} variants={container} initial="hidden" animate="visible">
+      {letters.map((letter, index) => (
+        <motion.span variants={child} key={index} style={{ color }}>{letter === " " ? "\u00A0" : letter}</motion.span>
+      ))}
+    </motion.div>
+  );
+};
+
+const WordReveal = ({ text, color }) => {
+  const words = text.split(" ");
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({ opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.6 } })
+  };
+  const child = {
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 20, transition: { type: "spring", damping: 12, stiffness: 100 } }
+  };
+  return (
+    <motion.div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }} variants={container} initial="hidden" animate="visible">
+      {words.map((word, index) => (
+        <motion.span variants={child} key={index} style={{ color, marginRight: "0.3em" }}>{word}</motion.span>
+      ))}
+    </motion.div>
+  );
+};
+
+export default function PetClinPortfolioSlider() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const handleNext = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) === slides.length ? 0 : prev + 1);
+  };
+
+  const handlePrev = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1) < 0 ? slides.length - 1 : prev - 1);
+  };
+
+  const currentSlide = slides[currentIndex];
+  const currentTheme = currentSlide.theme;
+
+  const pageVariants = {
+    initial: (direction) => ({ x: direction > 0 ? 100 : -100, opacity: 0 }),
+    animate: { x: 0, opacity: 1 },
+    exit: (direction) => ({ x: direction < 0 ? 100 : -100, opacity: 0 })
+  };
 
   return (
-    <div ref={container} className="h-screen flex items-center justify-center sticky top-0">
-      <motion.div 
-        style={{ scale, top: `calc(-5vh + ${i * 25}px)` }} 
-        className="flex flex-col relative w-[1000px] h-[500px] md:h-[600px] bg-white rounded-[2rem] border border-gray-200 shadow-2xl origin-top overflow-hidden"
-      >
-        <div className="flex h-full flex-col md:flex-row">
-          
-          {/* LADO ESQUERDO: TEXTO DE AUTORIDADE */}
-          <div className="w-full md:w-[60%] p-10 flex flex-col justify-center items-center text-center relative z-10">
-            <span className="inline-block py-1 px-3 rounded bg-gray-100 text-gray-500 text-[10px] md:text-xs font-black tracking-[0.2em] mb-6 uppercase">
-              {subtitle}
-            </span>
-            
-            <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#006400] leading-[0.85] mb-6 uppercase tracking-tight">
-              {title} <br/>
-              <span style={{ color: color }} className="opacity-90">{titleSecondLine}</span>
-            </h3>
-
-            <p className="text-gray-500 font-medium text-sm md:text-base leading-relaxed max-w-sm mb-8">
-              {description}
-            </p>
-
-            <button style={{ backgroundColor: color }} className="text-white px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-xs md:text-sm hover:brightness-110 transition-all shadow-lg flex items-center gap-2">
-              Agendar <ArrowRight size={16}/>
-            </button>
-          </div>
-
-          {/* LADO DIREITO: BADGE COLORIDO (Igual ao vídeo) */}
-          <div 
-            className="w-full md:w-[40%] h-full p-8 md:p-10 text-white flex flex-col justify-center relative overflow-hidden"
-            style={{ backgroundColor: color }}
-          >
-            {/* Efeito decorativo de fundo */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-
-            <h4 className="text-xl md:text-2xl font-black uppercase mb-6 border-b-2 border-white/30 pb-4 relative z-10">
-              {detailsTitle}
-            </h4>
-            
-            <ul className="space-y-4 relative z-10">
-              {detailsPoints.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-sm font-bold leading-snug opacity-95">
-                   <div className="mt-1 min-w-[16px]">
-                     <CheckCircle size={16} className="text-white" />
-                   </div>
-                   {point}
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-auto pt-8 relative z-10">
-               <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg text-center border border-white/10 inline-block w-full">
-                  <span className="text-[10px] uppercase tracking-widest font-bold">Disponibilidade Imediata</span>
-               </div>
-            </div>
-          </div>
-
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-// COMPONENTE PRINCIPAL QUE RENDERIZA A LISTA
-export default function Services() {
-  const container = useRef(null);
-  
-  // Monitora o scroll de TODO o container de serviços
-  const { scrollYProgress } = useScroll({
-    target: container,
-    offset: ['start start', 'end end']
-  })
-
-  return (
-    <div ref={container} className="relative mt-[10vh] bg-gray-50">
+    <div 
+      className="relative w-full min-h-screen overflow-hidden flex flex-col border-[16px] transition-colors duration-700 ease-in-out font-sans" 
+      style={{ backgroundColor: currentTheme.bg, borderColor: '#ffffff', boxSizing: 'border-box' }}
+    >
       
-      {/* TÍTULO DA SEÇÃO FIXO NO FLUXO (Opcional, pode tirar se quiser só os cards) */}
-      <div className="text-center py-20 px-6">
-        <h2 className="text-3xl md:text-5xl font-black text-[#006400] uppercase mb-2">
-          Nossos Serviços
-        </h2>
-        <p className="text-gray-500 font-medium">Role para baixo para explorar</p>
+      {/* --- NAVEGAÇÃO (SETAS) --- */}
+      <button 
+        onClick={handlePrev}
+        className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2"
+        style={{ color: currentTheme.text }}
+      >
+        <ArrowLeft size={48} strokeWidth={1.5} />
+      </button>
+
+      <button 
+        onClick={handleNext}
+        className="absolute right-2 md:left-[55%] top-1/2 -translate-y-1/2 z-40 hover:scale-110 active:scale-95 transition-transform duration-200 p-2"
+        style={{ color: currentTheme.text }}
+      >
+        <ArrowRight size={48} strokeWidth={1.5} />
+      </button>
+
+      {/* --- CONTEÚDO PRINCIPAL --- */}
+      <div className="flex-1 container mx-auto flex items-center justify-center px-6 md:px-0 relative z-10">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentIndex}
+            custom={direction}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="w-full grid md:grid-cols-12 gap-10 items-center h-full"
+          >
+            
+            {/* --- COLUNA ESQUERDA: TEXTOS --- */}
+            <div className="md:col-span-7 flex flex-col items-center text-center justify-center pt-8 md:pt-0">
+              
+              {/* CATEGORIA */}
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="mb-4 md:mb-8 border px-4 py-1.5 transition-colors duration-500 rounded-full"
+                style={{ borderColor: currentTheme.text }}
+              >
+                <span className="text-xs md:text-sm tracking-[0.25em] font-bold uppercase" style={{ color: currentTheme.text }}>
+                  {currentSlide.category}
+                </span>
+              </motion.div>
+
+              {/* TÍTULO PRINCIPAL */}
+              <div className="relative mb-6 flex flex-col items-center">
+                <div 
+                  // Removido 'tracking-tighter' excessivo, usando tracking-tight normal
+                  className="text-6xl md:text-8xl lg:text-[100px] leading-[0.9] font-black uppercase tracking-tight flex flex-col items-center" 
+                  style={{ fontFamily: 'Impact, sans-serif' }}
+                >
+                  <LetterReveal text={currentSlide.nameLine1} color={currentTheme.text} customDelay={0} />
+                  <LetterReveal text={currentSlide.nameLine2} color={currentTheme.text} customDelay={0.3} />
+                </div>
+
+                {/* SCRIPT (Posicionado no canto inferior direito, sem atrapalhar) */}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8, rotate: -15, x: 20 }}
+                  animate={{ opacity: 1, scale: 1, rotate: -6, x: 0 }}
+                  transition={{ delay: 0.8, type: "spring" }}
+                  // Posição absoluta relativa ao container do título
+                  className="absolute -bottom-4 -right-2 md:-right-8 z-10"
+                  style={{ color: currentTheme.accent, textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}
+                >
+                  <span className="font-serif italic text-4xl md:text-6xl font-bold tracking-tighter whitespace-nowrap">
+                    {currentSlide.scriptName}
+                  </span>
+                </motion.div>
+              </div>
+
+              {/* DESCRIÇÃO (Mais legível) */}
+              <div className="max-w-xl text-sm md:text-lg leading-relaxed font-medium mt-4 px-4 md:px-0">
+                <WordReveal text={currentSlide.description} color={currentTheme.text} />
+              </div>
+
+            </div>
+
+            {/* --- COLUNA DIREITA: IMAGEM --- */}
+            <div className="md:col-span-5 h-[40vh] md:h-[75vh] w-full relative flex items-center justify-center pb-8 md:pb-0">
+               <motion.div 
+                 initial={{ scale: 0.95, opacity: 0 }}
+                 animate={{ scale: 1, opacity: 1 }}
+                 transition={{ duration: 0.6, ease: "easeOut" }}
+                 className="relative w-full h-full border-[12px] md:border-[16px] z-20 overflow-hidden shadow-2xl rounded-sm"
+                 style={{ borderColor: currentTheme.border }}
+               >
+                  {/* Imagem Estática (Sem Hover de Zoom) */}
+                  <img 
+                    src={currentSlide.image} 
+                    alt={currentSlide.category} 
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Botão 'Saiba Mais' (Estilo Clicável) */}
+                  <div className="absolute top-0 right-0 p-0 m-0 z-30">
+                     <button 
+                       className="px-5 py-3 text-xs md:text-sm font-black flex items-center gap-2 uppercase tracking-widest transition-all duration-300 hover:brightness-110 cursor-pointer"
+                       style={{ 
+                         backgroundColor: currentTheme.theme?.buttonBg || 'rgba(255,255,255,0.9)', 
+                         color: currentTheme.theme?.buttonText || '#000',
+                         borderBottomLeftRadius: '8px'
+                       }}
+                     >
+                        SAIBA MAIS <Plus size={16} strokeWidth={3} />
+                     </button>
+                  </div>
+               </motion.div>
+            </div>
+
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {servicesData.map((project, i) => {
-        // Cálculo matemático para a escala funcionar perfeitamente empilhada
-        const targetScale = 1 - ( (servicesData.length - i) * 0.05 );
-        return (
-          <Card 
-            key={i} 
-            i={i} 
-            {...project} 
-            progress={scrollYProgress} 
-            range={[i * 0.25, 1]} 
-            targetScale={targetScale} 
-          />
-        )
-      })}
+      {/* --- BARRA DE PROGRESSO --- */}
+      <div className="absolute bottom-6 left-10 right-10 flex gap-3 z-20">
+         {slides.map((_, idx) => (
+            <div 
+              key={idx}
+              className="h-2 flex-1 rounded-full transition-all duration-300"
+              style={{ 
+                backgroundColor: idx === currentIndex 
+                  ? (currentTheme.text === '#ffffff' ? '#ffffff' : currentTheme.border) 
+                  : (currentTheme.text === '#ffffff' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)')
+              }}
+            />
+         ))}
+      </div>
+
     </div>
   );
 }
