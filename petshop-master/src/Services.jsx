@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { ArrowRight, ArrowLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Certifique-se que o caminho do arquivo está correto. 
+// Se você criou a pasta components, mude para: import('./components/ServiceModal')
 const ServiceModal = React.lazy(() => import('./ServiceModal'));
 
 // --- 1. DADOS E CONFIGURAÇÕES ---
@@ -105,11 +107,23 @@ const slides = [
   }
 ];
 
-// --- 2. COMPONENTES AUXILIARES ---
+// --- 2. COMPONENTES AUXILIARES CORRIGIDOS ---
 
 const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => {
+  // CORREÇÃO: Hooks declarados ANTES de qualquer return
   const letters = useMemo(() => text.split(""), [text]);
   
+  const container = useMemo(() => ({
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.2 + customDelay } }
+  }), [customDelay]);
+  
+  const child = useMemo(() => ({
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 40, transition: { type: "spring", damping: 12, stiffness: 100 } }
+  }), []);
+
+  // Agora podemos fazer o retorno condicional
   if (isMobile) {
     return (
       <motion.div 
@@ -123,16 +137,6 @@ const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => 
     );
   }
   
-  const container = useMemo(() => ({
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.2 + customDelay } }
-  }), [customDelay]);
-  
-  const child = useMemo(() => ({
-    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
-    hidden: { opacity: 0, y: 40, transition: { type: "spring", damping: 12, stiffness: 100 } }
-  }), []);
-  
   return (
     <motion.div style={{ display: "flex", overflow: "hidden" }} variants={container} initial="hidden" animate="visible">
       {letters.map((letter, index) => (
@@ -143,6 +147,20 @@ const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => 
 });
 
 const WordReveal = React.memo(({ text, color, isMobile }) => {
+  // CORREÇÃO: Hooks declarados ANTES de qualquer return
+  const words = useMemo(() => text.split(" "), [text]);
+
+  const container = useMemo(() => ({
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.6 } }
+  }), []);
+  
+  const child = useMemo(() => ({
+    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
+    hidden: { opacity: 0, y: 20, transition: { type: "spring", damping: 12, stiffness: 100 } }
+  }), []);
+
+  // Agora podemos fazer o retorno condicional
   if (isMobile) {
     return (
       <motion.div 
@@ -155,17 +173,6 @@ const WordReveal = React.memo(({ text, color, isMobile }) => {
       </motion.div>
     );
   }
-  
-  const words = useMemo(() => text.split(" "), [text]);
-  const container = useMemo(() => ({
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.6 } }
-  }), []);
-  
-  const child = useMemo(() => ({
-    visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 12, stiffness: 100 } },
-    hidden: { opacity: 0, y: 20, transition: { type: "spring", damping: 12, stiffness: 100 } }
-  }), []);
   
   return (
     <motion.div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }} variants={container} initial="hidden" animate="visible">
