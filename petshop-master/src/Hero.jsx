@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Phone, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { Phone, MapPin, MessageCircle } from 'lucide-react';
 
 export default function Hero() {
   const pawsRef = useRef([]);
@@ -43,28 +43,27 @@ export default function Hero() {
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#FF8C00] rounded-full blur-3xl opacity-20 pointer-events-none"></div>
       <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-white rounded-full blur-3xl opacity-10 pointer-events-none"></div>
       
-      {/* --- ONDA SUPERIOR */}
-      <div className="absolute top-0 right-0 w-full h-[240px] z-20 pointer-events-none">
-        <svg viewBox="0 0 1440 320" preserveAspectRatio="none" className="w-full h-full drop-shadow-xl">
+      {/* --- ONDA SUPERIOR AJUSTADA --- */}
+      <div className="absolute top-0 right-0 w-full h-[160px] z-20 pointer-events-none">
+        <svg viewBox="0 0 1440 160" preserveAspectRatio="none" className="w-full h-full drop-shadow-sm">
           <defs>
             <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" style={{stopColor: '#ffffff', stopOpacity: 1}} />
-              <stop offset="100%" style={{stopColor: '#f5f5f5', stopOpacity: 1}} />
+              <stop offset="100%" style={{stopColor: '#f8f8f8', stopOpacity: 1}} />
             </linearGradient>
           </defs>
-          {/* Curva suavizada para dar mais área branca no topo direito */}
           <path 
-            d="M 0,0 L 1440,0 L 1440,280 C 1100,290 850,100 0,0 Z" 
+            d="M 150,0 L 1440,0 L 1440,160 C 1100,160 900,80 150,0 Z" 
             fill="url(#waveGradient)" 
           />
         </svg>
       </div>
 
       {/* --- HEADER --- */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex justify-end px-6 pt-6">
+      <div className="absolute top-0 left-0 right-0 z-30 flex justify-end px-6 pt-4">
         <nav className="max-w-[1400px] w-full flex justify-end items-center gap-8">
             
-            {/* LINKS*/}
+            {/* LINKS */}
             <div className="hidden lg:flex gap-8 items-center">
               {['Sobre', 'Especialidades', 'Internamento'].map((item) => (
                 <a key={item} href="#" className="text-[#006400] font-bold text-sm uppercase tracking-wide hover:text-[#FF8C00] transition-colors relative group">
@@ -75,9 +74,9 @@ export default function Hero() {
             </div>
             
             <div className="flex items-center gap-6">
-              {/* BOTÃO PLANTÃO (Emergência) */}
-              <a href="#" className="bg-[#FF8C00] text-white px-5 py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg hover:bg-[#e67e00] hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                <Phone size={18} />
+              {/* BOTÃO PLANTÃO */}
+              <a href="#" className="bg-[#FF8C00] text-white px-5 py-2 rounded-md font-bold text-sm shadow-md hover:bg-[#e67e00] hover:scale-105 transition-all duration-300 flex items-center gap-2 h-10">
+                <Phone size={16} />
                 <span className="whitespace-nowrap">PLANTÃO 24H</span>
               </a>
 
@@ -86,7 +85,7 @@ export default function Hero() {
                 <img 
                   src="/petclin-removebg-preview.png" 
                   alt="PetClin Logo" 
-                  className="h-16 md:h-20 lg:h-24 w-auto object-contain"
+                  className="h-12 md:h-16 w-auto object-contain"
                 />
               </a>
             </div>
@@ -102,7 +101,7 @@ export default function Hero() {
       <div ref={el => pawsRef.current[4] = el} className="absolute top-[50%] right-[-3%] z-10 opacity-0"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076928.png" className="w-20 md:w-24 drop-shadow-2xl filter brightness-0 invert rotate-180" /></div>
       <div ref={el => pawsRef.current[5] = el} className="absolute bottom-[15%] left-[45%] z-10 opacity-0"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076928.png" className="w-28 md:w-32 drop-shadow-2xl filter brightness-0 invert rotate-45" /></div>
 
-      {/* MANCHA LARANJA INFERIOR */}
+      {/* MANCHA LARANJA */}
       <div className="absolute bottom-0 left-0 w-[45%] h-[75%] z-0 pointer-events-none">
          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
             <path d="M0,100 L0,20 Q30,0 50,30 Q80,80 60,100 Z" fill="url(#orangeBlob)" />
@@ -129,26 +128,25 @@ export default function Hero() {
         {/* COLUNA DIREITA */}
         <div className="md:col-span-7 flex flex-col justify-center items-start pt-20 md:pt-0 pl-4 md:pl-10 w-full">
           
-          {/* TIPOGRAFIA */}
           <div className="flex flex-col w-full font-display font-black uppercase italic leading-[0.9] text-white drop-shadow-2xl tracking-tighter">
             <span className="text-6xl md:text-8xl lg:text-9xl">Seu Pet</span>
             <span className="text-6xl md:text-8xl lg:text-9xl md:ml-24 lg:ml-32">Merece</span>
             <span className="text-7xl md:text-9xl lg:text-[8rem] md:ml-auto text-transparent bg-clip-text bg-gradient-to-r from-[#FF8C00] via-[#ff9933] to-[#ff7700] pb-2">O Melhor.</span>
           </div>
 
-          {/* BOTÃO E LOCALIZAÇÃO  */}
-          <div className="mt-12 flex flex-col md:flex-row gap-6 w-full items-center md:items-end justify-end md:pr-4">
+          {/* --- BOTÕES INFERIORES AJUSTADOS --- */}
+          <div className="mt-12 flex flex-col md:flex-row gap-4 w-full items-center md:items-end justify-end md:pr-4">
              
-             {/* Localização Sutil */}
-             <div className="hidden md:flex items-center gap-2 text-white/90 text-sm font-medium bg-white/10 px-4 py-2 rounded-full border border-white/20 backdrop-blur-md">
-                <MapPin size={16} className="text-[#FF8C00]" />
+             {/* 1. Localização */}
+             <div className="hidden md:flex items-center justify-center gap-2 text-white text-sm font-semibold bg-white/10 px-6 border border-white/20 backdrop-blur-md h-14 rounded-lg min-w-[200px]">
+                <MapPin size={18} className="text-[#FF8C00]" />
                 <span>Feira de Santana - BA</span>
              </div>
 
-             {/* Botão Principal de Conversão */}
-             <button className="group bg-white text-[#006400] px-8 py-4 rounded-full font-black uppercase tracking-wider shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-105 hover:shadow-[0_20px_50px_rgba(255,140,0,0.4)] transition-all duration-300 flex items-center gap-3">
-                Agendar Agora
-                <ArrowRight size={22} className="group-hover:translate-x-1 text-[#FF8C00] transition-transform" />
+             {/* 2. Botão WhatsApp */}
+             <button className="group bg-white text-[#006400] px-8 font-black uppercase tracking-wider shadow-lg hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center gap-3 h-14 rounded-lg min-w-[260px]">
+                Contato via WhatsApp
+                <MessageCircle size={20} className="text-[#FF8C00]" />
              </button>
 
           </div>

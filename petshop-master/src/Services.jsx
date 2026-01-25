@@ -98,7 +98,7 @@ const LetterReveal = ({ text, color, customDelay = 0 }) => {
   );
 };
 
-// Efeito Cascata: Palavra por Palavra (Usado na Descrição)
+// Efeito Cascata: Palavra por Palavra 
 const WordReveal = ({ text, color }) => {
   const words = text.split(" ");
 
