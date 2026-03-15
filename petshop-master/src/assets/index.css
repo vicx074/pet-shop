@@ -13,17 +13,17 @@ html.lenis {
   overflow: hidden;
 }
 @layer utilities {
-  /* 1. LARGURA MINÚSCULA */
+  /* LARGURA MINÚSCULA */
   ::-webkit-scrollbar {
     width: 4px; /* Quase um fio de cabelo */
   }
 
-  /* 2. TRILHO INVISÍVEL (Mais escondida impossível) */
+  /* TRILHO INVISÍVEL (Mais escondida impossível) */
   ::-webkit-scrollbar-track {
     background: transparent; 
   }
 
-  /* 3. AS 3 CORES + VISUAL "CORTADINHO" */
+  /* 3 CORES + VISUAL "CORTADINHO" */
   ::-webkit-scrollbar-thumb {
     /* O Segredo: Um gradiente que passa pelas 3 cores */
     background: linear-gradient(
@@ -53,4 +53,9 @@ html.lenis {
     scrollbar-width: thin;
     scrollbar-color: #FF8C00 transparent;
   }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }

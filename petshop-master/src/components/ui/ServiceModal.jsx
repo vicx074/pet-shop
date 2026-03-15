@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 
 const ServiceModal = ({ slide, isOpen, onClose }) => {
   const [modalImageLoaded, setModalImageLoaded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      // Deixamos apenas o overflow hidden para não rolar o fundo
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
+      
       // Preload da imagem do modal
       if (slide?.details?.coverImage) {
         const img = new Image();
@@ -18,22 +19,20 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
       }
     } else {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
       setModalImageLoaded(false);
     }
     return () => {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     };
   }, [isOpen, slide]);
 
-  if (!slide) return null; // Removemos a verificação do isOpen aqui para permitir animação de saída se necessário, controlado pelo AnimatePresence
+  if (!slide) return null;
 
   const { theme, details } = slide;
 
-  return (
+  // Renderizamos o modal no 'document.body' usando createPortal 
+  // para tirá-lo do fluxo do SmoothScroll
+  return createPortal(
     <div className={`fixed inset-0 z-[9999] w-full h-full ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
       <AnimatePresence>
         {isOpen && (
@@ -130,7 +129,8 @@ const ServiceModal = ({ slide, isOpen, onClose }) => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div>,
+    document.body // O portal empurra o HTML pra fora da sua Div do scroll
   );
 };
 

@@ -2,11 +2,9 @@ import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { ArrowRight, ArrowLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Certifique-se que o caminho do arquivo está correto. 
-// Se você criou a pasta components, mude para: import('./components/ServiceModal')
-const ServiceModal = React.lazy(() => import('./ServiceModal'));
+const ServiceModal = React.lazy(() => import('../components/ui/ServiceModal'));
 
-// --- 1. DADOS E CONFIGURAÇÕES ---
+// DADOS E CONFIGURAÇÕES ---
 const slides = [
   {
     id: 1,
@@ -240,6 +238,7 @@ export default function Services() {
 
   return (
     <div 
+    id="services-section"
       className="relative w-full min-h-screen overflow-hidden flex flex-col border-[8px] md:border-[16px] transition-colors duration-700 ease-in-out font-sans select-none" 
       style={{ 
         backgroundColor: currentTheme.bg, 

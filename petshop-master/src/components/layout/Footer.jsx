@@ -26,7 +26,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#002b00] text-white pt-24 pb-8 overflow-hidden font-sans">
+
+<footer id="footer-section" className="relative bg-[#002b00] text-white pt-16 pb-8 overflow-hidden font-sans border-t border-white/10">
       
       {/* ELEMENTO DECORATIVO DE FUNDO (Patinha Gigante Sutil) */}
       <div className="absolute top-0 right-[-10%] w-[600px] h-[600px] opacity-[0.03] pointer-events-none rotate-12">
@@ -82,12 +83,12 @@ export default function Footer() {
               <h3 className="font-bold uppercase tracking-wider text-sm">Localização</h3>
             </div>
             <p className="text-xl font-medium leading-relaxed text-white/90">
-              Rua Antônio Carlos Magalhães, 1372 <br/>
-              Cidade Nova <br/>
+              Rua da alegria, 123 <br/>
+              Bairro novo <br/>
               Feira de Santana - BA
             </p>
             <a 
-              href="https://maps.google.com/?q=Rua+Antônio+Carlos+Magalhães+1372+Feira+de+Santana" 
+              href="https://maps.google.com/?q=Rua+da+alegria+123+Feira+de+Santana" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-block text-sm font-bold text-[#FF8C00] border-b border-[#FF8C00]/30 hover:border-[#FF8C00] pb-0.5 transition-colors"
@@ -103,13 +104,13 @@ export default function Footer() {
               <h3 className="font-bold uppercase tracking-wider text-sm">Fale Conosco</h3>
             </div>
             <div className="flex flex-col gap-2">
-              <a href="tel:+557530306010" className="text-xl font-medium hover:text-[#FF8C00] transition-colors">(75) 3030-6010</a>
-              <a href="https://wa.me/5575992996010" className="text-xl font-medium hover:text-[#FF8C00] transition-colors">(75) 99299-6010</a>
+              <a href="#" className="text-xl font-medium hover:text-[#FF8C00] transition-colors">(75) 99999-9999</a>
+              <a href="#" className="text-xl font-medium hover:text-[#FF8C00] transition-colors">(75) 99999-9999</a>
             </div>
             <div className="pt-2 flex items-center gap-3">
                <Mail size={18} className="text-[#FF8C00]" />
-               <a href="mailto:atendimento.petclin2019@gmail.com" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-                 atendimento.petclin2019@gmail.com
+               <a href="mailto:atendimento.123@gmail.com" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+                 atendimento.123@gmail.com
                </a>
             </div>
           </motion.div>
