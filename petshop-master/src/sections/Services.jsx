@@ -105,10 +105,8 @@ const slides = [
   }
 ];
 
-// --- 2. COMPONENTES AUXILIARES CORRIGIDOS ---
 
 const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => {
-  // CORREÇÃO: Hooks declarados ANTES de qualquer return
   const letters = useMemo(() => text.split(""), [text]);
   
   const container = useMemo(() => ({
@@ -121,7 +119,6 @@ const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => 
     hidden: { opacity: 0, y: 40, transition: { type: "spring", damping: 12, stiffness: 100 } }
   }), []);
 
-  // Agora podemos fazer o retorno condicional
   if (isMobile) {
     return (
       <motion.div 
@@ -145,7 +142,6 @@ const LetterReveal = React.memo(({ text, color, customDelay = 0, isMobile }) => 
 });
 
 const WordReveal = React.memo(({ text, color, isMobile }) => {
-  // CORREÇÃO: Hooks declarados ANTES de qualquer return
   const words = useMemo(() => text.split(" "), [text]);
 
   const container = useMemo(() => ({
@@ -158,7 +154,6 @@ const WordReveal = React.memo(({ text, color, isMobile }) => {
     hidden: { opacity: 0, y: 20, transition: { type: "spring", damping: 12, stiffness: 100 } }
   }), []);
 
-  // Agora podemos fazer o retorno condicional
   if (isMobile) {
     return (
       <motion.div 
@@ -181,7 +176,7 @@ const WordReveal = React.memo(({ text, color, isMobile }) => {
   );
 });
 
-// --- 3. COMPONENTE PRINCIPAL ---
+//  COMPONENTE PRINCIPAL ---
 export default function Services() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);

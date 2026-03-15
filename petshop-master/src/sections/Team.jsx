@@ -51,7 +51,7 @@ export default function Team() {
       className="relative w-full py-24 md:py-32 bg-[#002b00] overflow-hidden content-visibility-auto"
     >
       
-      {/* 1. LETREIRO GIGANTE (MARQUEE CSS PURO PARA PERFORMANCE) */}
+      {/*  LETREIRO GIGANTE (MARQUEE CSS PURO PARA PERFORMANCE) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full overflow-hidden whitespace-nowrap opacity-[0.03] pointer-events-none z-0">
         <div className="inline-block animate-[marquee_30s_linear_infinite]">
           <span className="text-[12rem] md:text-[20rem] font-black uppercase tracking-tighter text-white">

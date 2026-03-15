@@ -38,7 +38,7 @@ export default function Header() {
       }`}
     >
       <nav 
-        // A mágica acontece aqui: bg-transparent sem scroll, bg-white com scroll
+        // bg-transparent sem scroll, bg-white com scroll
         className={`mx-auto max-w-[1400px] w-full flex justify-between items-center transition-all duration-500 ${
           scrolled 
             ? 'bg-white/95 backdrop-blur-md shadow-xl border border-gray-200 rounded-full px-6 md:px-8 py-2 md:py-3' 

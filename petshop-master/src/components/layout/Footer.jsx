@@ -56,7 +56,7 @@ export default function Footer() {
           </div>
 
           <a 
-            href="https://wa.me/5575992996010" 
+            href="#" 
             target="_blank" 
             rel="noopener noreferrer"
             className="group flex items-center gap-4 bg-[#FF8C00] hover:bg-[#ff7700] text-white px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-orange-900/20"
